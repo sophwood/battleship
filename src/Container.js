@@ -70,8 +70,121 @@ export default class Container extends Component {
       </div>
     )
   }
+//
+//  checkConflicts(id, left, top) {
+//      let conflict = false;
+//      Object.keys(this.state.ships).map(key => {
+//          const ship = this.state.ships[key];
+//          const height = this.state.ships[id].height;
+//          // left = intended left
+//          // top = intended top
+//          // ship.left = left of other ships
+//          // ship.top = top of other ships
+//          // ship.height = height of other ships
+//          if (left === ship.left && ((ship.top <= top && top <= (ship.top + ship.height)) || (ship.top <= (top + height) && (top + height) <= (ship.top + ship.height)))) {
+//              conflict = true;
+//          }
+//      })
+//      return conflict;
+//  }
 
-  checkConflicts(id, left, top) {
+  rotate(id) {
+//    if (this.checkConflicts(id, this.state.ships[id].left, this.state.ships[id].top)) {
+//        return;
+//    }
+
+      // these represent where the ship in question would be once rotated
+      const left = this.state.ships[id].left;
+      const top = this.state.ships[id].top;
+      const height = this.state.ships[id].width;
+      const width = this.state.ships[id].height;
+
+      let conflict = false;
+
+      Object.keys(this.state.ships).map(key => {
+          const ship = this.state.ships[key];
+          // left and top won't change
+          // need to check if new width and height conflict with other ships
+          //
+          // left = intended left
+          // top = intended top
+          // height of this ship
+          // ship.left = left of other ships
+          // ship.top = top of other ships
+          // ship.height = height of other ships
+
+          if (key !== id) {
+              let heightS1 = (left <= ship.left && ship.left <= (left + width));
+              let heightS2 = (left <= (ship.left + ship.width) && (ship.left + ship.width) <= (left + width));
+              let widthS1 = (top <= ship.top && ship.top <= (top + height));
+              let widthS2 = (top <= (ship.top + ship.height) && (ship.top + ship.height) <= (top + height));
+
+              let heightB1 = (ship.left <= left && left <= (ship.left + ship.width));
+              let heightB2 = (ship.left <= (left + width) && (left + width) <= (ship.left + ship.width));
+              let widthB1 = (ship.top <= top && top <= (ship.top + ship.height));
+              let widthB2 = (ship.top <= (top + height) && (top + height) <= (ship.top + ship.height))
+
+              if (heightS1 && widthS1) {
+                  conflict = true;
+              }
+              if (heightS1 && widthS2) {
+                  conflict = true;
+              }
+              if (heightS2 && widthS1) {
+                  conflict = true;
+              }
+              if (heightS2 && widthS2) {
+                  conflict = true;
+              }
+              if (heightB1 && widthB1) {
+                  conflict = true;
+              }
+              if (heightB1 && widthB2) {
+                  conflict = true;
+              }
+              if (heightB2 && widthB1) {
+                  conflict = true;
+              }
+              if (heightB2 && widthB2) {
+                  conflict = true;
+              }
+//              // height check
+//              if ((left <= ship.left && ship.left <= (left + width)) || (left <= (ship.left + ship.width) && (ship.left + ship.width) <= (left + width))) {
+//                  conflict = true;
+//              }
+//              // width check
+//              if ((top <= ship.top && ship.top <= (top + height)) || (top <= (ship.top + ship.height) && (ship.top + ship.height) <= (top + height))) {
+//                  conflict = true;
+//              }
+//              // height check
+//              if ((ship.left <= left && left <= (ship.left + ship.width)) || (ship.left <= (left + width) && (left + width) <= (ship.left + ship.width))) {
+//                  conflict = true;
+//              }
+//              // width check
+//              if ((ship.top <= top && top <= (ship.top + ship.height)) || (ship.top <= (top + height) && (top + height) <= (ship.top + ship.height))) {
+//                  conflict = true;
+//              }
+          }
+      })
+    if (!conflict) {
+        this.setState(update(this.state, {
+            ships: {
+             [id]: {
+               $merge: {
+                 height: this.state.ships[id].width,
+                 width: this.state.ships[id].height
+               }
+             }
+            }
+        }));
+    }
+  }
+
+  moveBox(id, left, top) {
+    console.log(id + " " + left + " " + top)
+//    if (this.checkConflicts(id, left, top)) {
+//        return;
+//    }
       let conflict = false;
       Object.keys(this.state.ships).map(key => {
           const ship = this.state.ships[key];
@@ -85,30 +198,7 @@ export default class Container extends Component {
               conflict = true;
           }
       })
-      return conflict;
-  }
-
-  rotate(id) {
-//    const left = this.state.ships[id].left;
-//    const top = this.state.ships[id].top;
-//    if (this.checkConflicts(id, this.state.ships[id].left, this.state.ships[id].top)) {
-//        return;
-//    }
-    this.setState(update(this.state, {
-        ships: {
-         [id]: {
-           $merge: {
-             height: this.state.ships[id].width,
-             width: this.state.ships[id].height
-           }
-         }
-        }
-    }));
-  }
-
-  moveBox(id, left, top) {
-    console.log(id + " " + left + " " + top)
-    if (this.checkConflicts(id, left, top)) {
+    if (conflict) {
         return;
     }
     this.setState(update(this.state, {
