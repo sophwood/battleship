@@ -26,18 +26,15 @@ export default class Box extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        width: '48px',
-        height: this.props.height
+        height: this.props.height,
+        width: this.props.width
     }
     this.rotate = this.rotate.bind(this);
   }
 
   rotate(e) {
     e.preventDefault();
-    this.setState({
-        width: this.state.height,
-        height: this.state.width
-    })
+    this.props.rotate(this.props.id);
   }
 
   render() {
@@ -51,12 +48,12 @@ export default class Box extends Component {
       border: '1px solid black',
       backgroundColor: 'thistle',
       cursor: 'move',
-      width: this.state.width,
-      height: this.state.height
+      height: this.props.height,
+      width: this.props.width
     };
 
     return connectDragSource(
-      <div style={{ ...style, left, top }} onClick = {this.rotate}>
+      <div style={{ ...style, left, top }} onContextMenu={this.rotate}>
         {children}
       </div>
     );
