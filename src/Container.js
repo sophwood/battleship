@@ -6,14 +6,6 @@ import { DropTarget, DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import snapToGrid from './snapToGrid';
 
-const styles = {
-  width: 500,
-  height: 500,
-  border: '1px solid black',
-  position: 'relative',
-  margin: '0 auto'
-};
-
 const boxTarget = {
   drop(props, monitor, component) {
     const item = monitor.getItem();
@@ -48,6 +40,19 @@ export default class Container extends Component {
     };
   }
 
+  renderSquare(i) {
+    return (
+      <div key={i} style={{
+          border: '1px dashed black',
+          backgroundColor: 'white',
+          width: '48px',
+          height: '48px',
+          zIndex: 0
+        }}>
+      </div>
+    )
+  }
+
   moveBox(id, left, top, height) {
     this.setState(update(this.state, {
       boxes: {
@@ -66,19 +71,41 @@ export default class Container extends Component {
     const { connectDropTarget } = this.props;
     const { boxes} = this.state;
 
+    const styles = {
+      width: 500,
+      height: 500,
+      border: '1px solid black',
+      position: 'relative',
+      margin: '0 auto'
+    };
+
+    var squares = [];
+
+    for (let i = 0; i < 100; i++) {
+      squares.push(this.renderSquare(i));
+    }
+
     return connectDropTarget(
       <div style={styles}>
-        {Object.keys(boxes).map(key => {
-          const { left, top, height } = boxes[key];
-          return (
-            <Battleship key={key}
-                 id={key}
-                 left={left}
-                 top={top}
-                 height={height}>
-            </Battleship>
-          );
-        })}
+        <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexWrap: 'wrap'
+          }}>
+          {squares}
+          {Object.keys(boxes).map(key => {
+            const { left, top, height } = boxes[key];
+            return (
+              <Battleship key={key}
+                          id={key}
+                          left={left}
+                          top={top}
+                          height={height}>
+              </Battleship>
+            );
+          })}
+        </div>
       </div>
     );
   }

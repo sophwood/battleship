@@ -26,7 +26,7 @@ export default class Box extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        width: '50px',
+        width: '48px',
         height: this.props.height
     }
     this.rotate = this.rotate.bind(this);
