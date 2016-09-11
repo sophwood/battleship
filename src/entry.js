@@ -1,5 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import DragAroundNaive from './index';
+import Container from './Container';
 
-ReactDOM.render(<DragAroundNaive />, document.getElementById('mount'));
+ReactDOM.render(<Container />, document.getElementById('mount'));

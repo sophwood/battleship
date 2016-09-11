@@ -9,7 +9,7 @@ const boxSource = {
   }
 };
 
-@DragSource(ItemTypes.BOX, boxSource, (connect, monitor) => ({
+@DragSource(ItemTypes.Battleship, boxSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 }))
@@ -20,7 +20,6 @@ export default class Box extends Component {
     id: PropTypes.any.isRequired,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
-    hideSourceOnDrag: PropTypes.bool.isRequired,
     children: PropTypes.node
   };
 
@@ -42,15 +41,15 @@ export default class Box extends Component {
   }
 
   render() {
-    const { hideSourceOnDrag, left, top, connectDragSource, isDragging, children } = this.props;
-    if (isDragging && hideSourceOnDrag) {
+    const { left, top, connectDragSource, isDragging, children } = this.props;
+    if (isDragging) {
       return null;
     }
 
     const style = {
       position: 'absolute',
-      border: '1px dashed gray',
-      backgroundColor: 'white',
+      border: '1px solid black',
+      backgroundColor: 'thistle',
       cursor: 'move',
       width: this.state.width,
       height: this.state.height

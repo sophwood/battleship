@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import update from 'react/lib/update';
 import ItemTypes from './ItemTypes';
-import Box from './Box';
+import Battleship from './Battleship';
 import { DropTarget, DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import snapToGrid from './snapToGrid';
@@ -27,12 +27,11 @@ const boxTarget = {
 };
 
 @DragDropContext(HTML5Backend)
-@DropTarget(ItemTypes.BOX, boxTarget, connect => ({
+@DropTarget(ItemTypes.Battleship, boxTarget, connect => ({
   connectDropTarget: connect.dropTarget()
 }))
 export default class Container extends Component {
   static propTypes = {
-    hideSourceOnDrag: PropTypes.bool.isRequired,
     connectDropTarget: PropTypes.func.isRequired
   };
 
@@ -64,7 +63,7 @@ export default class Container extends Component {
   }
 
   render() {
-    const { hideSourceOnDrag, connectDropTarget } = this.props;
+    const { connectDropTarget } = this.props;
     const { boxes} = this.state;
 
     return connectDropTarget(
@@ -72,13 +71,12 @@ export default class Container extends Component {
         {Object.keys(boxes).map(key => {
           const { left, top, height } = boxes[key];
           return (
-            <Box key={key}
+            <Battleship key={key}
                  id={key}
                  left={left}
                  top={top}
-                 hideSourceOnDrag={hideSourceOnDrag}
                  height={height}>
-            </Box>
+            </Battleship>
           );
         })}
       </div>
