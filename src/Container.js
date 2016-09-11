@@ -5,6 +5,9 @@ import Battleship from './Battleship';
 import { DropTarget, DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import snapToGrid from './snapToGrid';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 const boxTarget = {
   drop(props, monitor, component) {
@@ -38,6 +41,10 @@ export default class Container extends Component {
   constructor(props) {
     super(props);
     this.state = { ships };
+
+    socket.on('click', data => {
+        console.log(data);
+    })
   }
 
   renderSquare(i) {
@@ -82,6 +89,7 @@ export default class Container extends Component {
         }
       }
     }));
+    socket.emit('click', {left, top});
   }
 
   render() {

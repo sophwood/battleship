@@ -4,14 +4,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-@app.route("/hello")
-def hello():
-    return "Hello World!"
-
-@socketio.on('my event')
+@socketio.on('click')
 def handle_my_custom_event(json):
     print('received json: ' + str(json))
-    emit('receipt', json)
+    emit('click', json)
 
 if __name__ == "__main__":
     socketio.run(app)
