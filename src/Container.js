@@ -4,20 +4,23 @@ import ItemTypes from './ItemTypes';
 import Box from './Box';
 import { DropTarget, DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import snapToGrid from './snapToGrid';
 
 const styles = {
-  width: 300,
-  height: 300,
+  width: 500,
+  height: 500,
   border: '1px solid black',
-  position: 'relative'
+  position: 'relative',
+  margin: '0 auto'
 };
 
 const boxTarget = {
   drop(props, monitor, component) {
     const item = monitor.getItem();
     const delta = monitor.getDifferenceFromInitialOffset();
-    const left = Math.round(item.left + delta.x);
-    const top = Math.round(item.top + delta.y);
+    let left = Math.round(item.left + delta.x);
+    let top = Math.round(item.top + delta.y);
+    [left, top] = snapToGrid(left, top);
 
     component.moveBox(item.id, left, top);
   }
@@ -37,19 +40,23 @@ export default class Container extends Component {
     super(props);
     this.state = {
       boxes: {
-        'a': { top: 20, left: 80, title: 'Drag me around' },
-        'b': { top: 180, left: 20, title: 'Drag me too' }
+        'ship1': { top: 0, left: 0, height: 50 },
+        'ship2': { top: 100, left: 50, height: 100 },
+        'ship3': { top: 150, left: 150, height: 150 },
+        'ship4': { top: 100, left: 400, height: 200 },
+        'ship5': { top: 250, left: 300, height: 250 }
       }
     };
   }
 
-  moveBox(id, left, top) {
+  moveBox(id, left, top, height) {
     this.setState(update(this.state, {
       boxes: {
         [id]: {
           $merge: {
             left: left,
-            top: top
+            top: top,
+            height: height
           }
         }
       }
@@ -63,14 +70,14 @@ export default class Container extends Component {
     return connectDropTarget(
       <div style={styles}>
         {Object.keys(boxes).map(key => {
-          const { left, top, title } = boxes[key];
+          const { left, top, height } = boxes[key];
           return (
             <Box key={key}
                  id={key}
                  left={left}
                  top={top}
-                 hideSourceOnDrag={hideSourceOnDrag}>
-              {title}
+                 hideSourceOnDrag={hideSourceOnDrag}
+                 height={height}>
             </Box>
           );
         })}

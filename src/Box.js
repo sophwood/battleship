@@ -27,8 +27,8 @@ export default class Box extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        width: '100px',
-        height: '50px'
+        width: '50px',
+        height: this.props.height
     }
     this.rotate = this.rotate.bind(this);
   }
@@ -51,7 +51,6 @@ export default class Box extends Component {
       position: 'absolute',
       border: '1px dashed gray',
       backgroundColor: 'white',
-      padding: '0.5rem 1rem',
       cursor: 'move',
       width: this.state.width,
       height: this.state.height
