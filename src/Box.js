@@ -1,27 +1,65 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from './shouldPureComponentUpdate';
+import ItemTypes from './ItemTypes';
+import { DragSource } from 'react-dnd';
 
-const styles = {
-  border: '1px dashed gray',
-  padding: '0.5rem 1rem',
-  cursor: 'move'
+const boxSource = {
+  beginDrag(props) {
+    const { id, left, top } = props;
+    return { id, left, top };
+  }
 };
 
+@DragSource(ItemTypes.BOX, boxSource, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))
 export default class Box extends Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    yellow: PropTypes.bool
+    connectDragSource: PropTypes.func.isRequired,
+    isDragging: PropTypes.bool.isRequired,
+    id: PropTypes.any.isRequired,
+    left: PropTypes.number.isRequired,
+    top: PropTypes.number.isRequired,
+    hideSourceOnDrag: PropTypes.bool.isRequired,
+    children: PropTypes.node
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  constructor(props) {
+    super(props);
+    this.state = {
+        width: '100px',
+        height: '50px'
+    }
+    this.rotate = this.rotate.bind(this);
+  }
+
+  rotate(e) {
+    e.preventDefault();
+    this.setState({
+        width: this.state.height,
+        height: this.state.width
+    })
+  }
 
   render() {
-    const { title, yellow } = this.props;
-    const backgroundColor = yellow ? 'yellow' : 'white';
+    const { hideSourceOnDrag, left, top, connectDragSource, isDragging, children } = this.props;
+    if (isDragging && hideSourceOnDrag) {
+      return null;
+    }
 
-    return (
-      <div style={{...styles, backgroundColor }}>
-        {title}
+    const style = {
+      position: 'absolute',
+      border: '1px dashed gray',
+      backgroundColor: 'white',
+      padding: '0.5rem 1rem',
+      cursor: 'move',
+      width: this.state.width,
+      height: this.state.height
+    };
+
+    return connectDragSource(
+      <div style={{ ...style, left, top }} onClick = {this.rotate}>
+        {children}
       </div>
     );
   }

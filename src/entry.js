@@ -1,5 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import DragAroundCustomDragLayer from './index';
+import DragAroundNaive from './index';
 
-ReactDOM.render(<DragAroundCustomDragLayer />, document.getElementById('mount'));
+ReactDOM.render(<DragAroundNaive />, document.getElementById('mount'));

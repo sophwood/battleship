@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from './shouldPureComponentUpdate';
 import update from 'react/lib/update';
 import ItemTypes from './ItemTypes';
-import DraggableBox from './DraggableBox';
-import snapToGrid from './snapToGrid';
-import { DropTarget } from 'react-dnd';
+import Box from './Box';
+import { DropTarget, DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 const styles = {
   width: 300,
@@ -15,29 +14,24 @@ const styles = {
 
 const boxTarget = {
   drop(props, monitor, component) {
-    const delta = monitor.getDifferenceFromInitialOffset();
     const item = monitor.getItem();
-
-    let left = Math.round(item.left + delta.x);
-    let top = Math.round(item.top + delta.y);
-    if (props.snapToGrid) {
-      [left, top] = snapToGrid(left, top);
-    }
+    const delta = monitor.getDifferenceFromInitialOffset();
+    const left = Math.round(item.left + delta.x);
+    const top = Math.round(item.top + delta.y);
 
     component.moveBox(item.id, left, top);
   }
 };
 
+@DragDropContext(HTML5Backend)
 @DropTarget(ItemTypes.BOX, boxTarget, connect => ({
   connectDropTarget: connect.dropTarget()
 }))
 export default class Container extends Component {
   static propTypes = {
-    connectDropTarget: PropTypes.func.isRequired,
-    snapToGrid: PropTypes.bool.isRequired
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate;
+    hideSourceOnDrag: PropTypes.bool.isRequired,
+    connectDropTarget: PropTypes.func.isRequired
+  };
 
   constructor(props) {
     super(props);
@@ -62,24 +56,24 @@ export default class Container extends Component {
     }));
   }
 
-  renderBox(item, key) {
-    return (
-      <DraggableBox key={key}
-                    id={key}
-                    {...item} />
-    );
-  }
-
   render() {
-    const { connectDropTarget } = this.props;
-    const { boxes } = this.state;
+    const { hideSourceOnDrag, connectDropTarget } = this.props;
+    const { boxes} = this.state;
 
     return connectDropTarget(
       <div style={styles}>
-        {Object
-          .keys(boxes)
-          .map(key => this.renderBox(boxes[key], key))
-        }
+        {Object.keys(boxes).map(key => {
+          const { left, top, title } = boxes[key];
+          return (
+            <Box key={key}
+                 id={key}
+                 left={left}
+                 top={top}
+                 hideSourceOnDrag={hideSourceOnDrag}>
+              {title}
+            </Box>
+          );
+        })}
       </div>
     );
   }
