@@ -18,6 +18,14 @@ const boxTarget = {
   }
 };
 
+const ships = {
+  'ship1': { top: 0, left: 0, height: 48 },
+  'ship2': { top: 100, left: 50, height: 98 },
+  'ship3': { top: 150, left: 150, height: 148 },
+  'ship4': { top: 100, left: 400, height: 198 },
+  'ship5': { top: 250, left: 300, height: 248 }
+};
+
 @DragDropContext(HTML5Backend)
 @DropTarget(ItemTypes.Battleship, boxTarget, connect => ({
   connectDropTarget: connect.dropTarget()
@@ -29,21 +37,13 @@ export default class Container extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      boxes: {
-        'ship1': { top: 0, left: 0, height: 50 },
-        'ship2': { top: 100, left: 50, height: 100 },
-        'ship3': { top: 150, left: 150, height: 150 },
-        'ship4': { top: 100, left: 400, height: 200 },
-        'ship5': { top: 250, left: 300, height: 250 }
-      }
-    };
+    this.state = { ships };
   }
 
   renderSquare(i) {
     return (
       <div key={i} style={{
-          border: '1px dashed black',
+          border: '1px dashed grey',
           backgroundColor: 'white',
           width: '48px',
           height: '48px',
@@ -53,14 +53,31 @@ export default class Container extends Component {
     )
   }
 
-  moveBox(id, left, top, height) {
+  moveBox(id, left, top) {
+    console.log(id + " " + left + " " + top)
+    let conflict = false;
+    Object.keys(this.state.ships).map(key => {
+        console.log(this.state.ships[key])
+        const ship = this.state.ships[key]
+        const height = this.state.ships[id].height
+        // left = intended left
+        // top = intended top
+        // ship.left = left of other ships
+        // ship.top = top of other ships
+        // ship.height = height of other ships
+        if (left === ship.left && ((ship.top <= top && top <= (ship.top + ship.height)) || (ship.top <= (top + height) && (top + height) <= (ship.top + ship.height)))) {
+            conflict = true;
+        }
+    })
+    if (conflict) {
+        return;
+    }
     this.setState(update(this.state, {
-      boxes: {
+      ships: {
         [id]: {
           $merge: {
             left: left,
-            top: top,
-            height: height
+            top: top
           }
         }
       }
@@ -69,7 +86,7 @@ export default class Container extends Component {
 
   render() {
     const { connectDropTarget } = this.props;
-    const { boxes} = this.state;
+    const { ships} = this.state;
 
     const styles = {
       width: 500,
@@ -94,8 +111,8 @@ export default class Container extends Component {
             flexWrap: 'wrap'
           }}>
           {squares}
-          {Object.keys(boxes).map(key => {
-            const { left, top, height } = boxes[key];
+          {Object.keys(ships).map(key => {
+            const { left, top, height } = ships[key];
             return (
               <Battleship key={key}
                           id={key}
